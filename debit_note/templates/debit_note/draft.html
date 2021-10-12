@@ -1,0 +1,117 @@
+{% extends 'account/base.html' %}
+{% load bootstrap5 %}
+{% block content %}
+
+
+<div class="container mt-5 mb-5">
+    <div class="row mt-5 mb-5">
+        <div class="col">
+            <a class="btn btn-primary" href="{% url 'note_all'%}">Список всех нот</a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <h4>Компании</h4>
+            {% if not issuers.update %}
+            {% for company in issuers.value %}
+                <p>{{ company.name }}</p>
+            {% endfor %}
+            <a href="{% url 'note_settings' %}?option={{ issuers.name }}">Редактировать</a>
+            {% else %}
+            <form action="" method="post">
+                {% csrf_token %}
+                {% bootstrap_formset formset %}
+                {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
+            </form>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <h4>Валюты</h4>
+            {% if not currencies.update %}
+            {% for currency in currencies.value %}
+                <p>{{ currency.name }}</p>
+            {% endfor %}
+            <a href="{% url 'note_settings' %}?option={{ currencies.name }}">Редактировать</a>
+            <a href="{% url 'note_settings' %}?option={{ currencies_create.name }}">+</a>
+            {% else %}
+            <form action="" method="post">
+                {% csrf_token %}
+                {% bootstrap_formset formset %}
+                {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
+            </form>
+            {% endif %}
+            {% if currencies_create.create %}
+                <form action="" method="post">
+                    {% csrf_token %}
+                    {% bootstrap_field form.company_creator %}
+                    {% bootstrap_field form.name %}
+                    {% bootstrap_field form.chosen_by_default %}
+                    {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
+                </form>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <h4>Способы оплаты</h4>
+            {% if not payment_methods.update %}
+            {% for method in payment_methods.value %}
+                <p>{{ method.name }}</p>
+            {% endfor %}
+            <a href="{% url 'note_settings' %}?option={{ payment_methods.name }}">Редактировать</a>
+            <a href="{% url 'note_settings' %}?option={{ payment_methods_create.name }}">+</a>
+            {% else %}
+            <form action="" method="post">
+                {% csrf_token %}
+                {% bootstrap_formset formset %}
+                {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
+            </form>
+            {% endif %}
+            {% if payment_methods_create.create %}
+                <form action="" method="post">
+                    {% csrf_token %}
+                    {% bootstrap_field form.company_creator %}
+                    {% bootstrap_field form.name %}
+                    {% bootstrap_field form.chosen_by_default %}
+                    {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
+                </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+
+
+<h6>Статус</h6>
+<li>
+    <input type="checkbox" id="paid_true" style="float: left; margin-left: 5px" name="is_paid" value="True" {% if view.filter_get_context.true %}checked{% endif %}>
+    <label for="paid_true" style="float: left; margin-left: 5px">Оплачено</label>
+</li>
+<br>
+<li>
+    <input style="float: left; margin-left: 5px" type="checkbox" id="paid_false" name="is_paid" value="False" {% if view.filter_get_context.false %}checked{% endif %}>
+    <label style="float: left; margin-left: 5px" for="paid_false">Не оплачено</label>
+</li>
+<hr>
+<h6>Год</h6>
+{% for year in view.get_all_years %}
+    <li>
+        <input style="float: left; margin-left: 5px" type="checkbox" id="{{ year }}" name="year" value="{{ year }}" {% if year in view.filter_get_context %}checked{% endif %}>
+        <label style="float: left; margin-left: 5px" for="{{ year }}">{{ year }}</label>
+    </li>
+    <br>
+{% endfor %}
+<hr>
+<h6>Месяц</h6>
+{% for month in view.get_all_months %}
+    <li>
+        <input style="float: left; margin-left: 5px" type="checkbox" id="{{ month }}" name="month" value="{{ month }}" {% if month in view.filter_get_context %}checked{% endif %}>
+        <label style="float: left; margin-left: 5px" for="{{ month }}">{{ month }}</label>
+    </li>
+    <br>
+{% endfor %}

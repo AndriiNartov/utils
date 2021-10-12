@@ -1,0 +1,82 @@
+{% extends 'debit_note/base.html' %}
+{% load bootstrap5 %}
+{% block content %}
+
+
+{% for option_name, option_values in options.items %}
+<div class="row mb-5">
+    <div class="col">
+        <div class="card">
+        <div class="card-header">
+            <h4>{{ option_values.verbose_name }}</h4>
+        </div>
+        <div class="card-body">
+        <div class="card-text">
+        {% if not make_action or option_param != option_values.name %}
+        {% for instance in option_values.queryset %}
+            <p>{{ instance.name }}{% if instance.chosen_by_default %} <span class="badge bg-light text-dark">По умолчанию</span>{% endif %}</p>
+        {% endfor %}
+            <div class="row">
+                {% if option_values.queryset %}
+                <div class="col-auto">
+                    <form action="">
+                        {% bootstrap_button "Редактировать" button_type="submit" button_class="btn-primary btn-sm" %}
+                        <input type="hidden" name="{{ option_kwarg }}" value="{{ option_values.name}}">
+                        <input type="hidden" name="{{ action_kwarg }}" value="{{ update_kwarg }}">
+                    </form>
+                </div>
+                {% endif %}
+                {% if not option_values.not_create_option %}
+                <div class="col-auto">
+                    <form action="">
+                        {% bootstrap_button "Создать" button_type="submit" button_class="btn-primary btn-sm" %}
+                        <input type="hidden" name="{{ option_kwarg }}" value="{{ option_values.name}}">
+                        <input type="hidden" name="{{ action_kwarg }}" value="{{ create_kwarg }}">
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        {% elif formset %}
+            <form action="" method="post">
+                {% csrf_token %}
+                {% bootstrap_formset formset %}
+                {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary btn-sm" %}
+            </form>
+        {% elif form %}
+            <form action="" method="post">
+                {% csrf_token %}
+                {% bootstrap_field form.company_creator %}
+                {% bootstrap_field form.name %}
+                {% bootstrap_field form.chosen_by_default %}
+                {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary btn-sm" %}
+            </form>
+        {% endif %}
+        </div>
+        </div>
+    </div>
+    </div>
+</div>
+{% endfor %}
+
+
+<script type="application/javascript">
+    function checkOnlyOneChosenByDefaultCheckbox() {
+
+    var checkbox_all = document.querySelectorAll('#chosen_by_default');
+
+    // Event Listener:
+    checkbox_all.forEach(el => el.addEventListener('change', function(event){
+        if(el.checked === true){
+            el.id = 'checked_chosen_by_default'
+            var checkbox_all = document.querySelectorAll('#chosen_by_default');
+            checkbox_all.forEach(function (el){
+                el.checked = false
+            })
+            el.id = 'chosen_by_default'
+        }
+    }))
+}
+checkOnlyOneChosenByDefaultCheckbox()
+</script>
+
+{% endblock %}

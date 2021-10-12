@@ -1,0 +1,100 @@
+{% load bootstrap5 %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <title>Версия для печати</title>
+  </head>
+  <body>
+    <div class="container" style="font-size: x-large; width: 21cm; height: 29.7cm">
+        <div class="row">
+            <div class="col-12 text-center">
+                <table class="table table-bordered mt-5">
+                    <tr>
+                        <td style="width: 50%">Nota obciazeniowa</td>
+                        <td>NR {{ note.number }}</td>
+                    </tr>
+                    <tr>
+                        <td>Data wystawienia:<br>{{ note.issue_date|date:"d/m/Y" }}</td>
+                        <td>Termin platnosci:<br>{{ note.payment_deadline_date|date:"d/m/Y" }}</td>
+                    </tr>
+                    <tr>
+                        <td>Metoda platnosci: {{ note.payment_method }}</td>
+                        <td>Oryginal</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-12">
+                <table style="width: 100%">
+                    <tr>
+                        <td>Wystawca:</td>
+                        <td>Nabywca:</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 50%">{{ note.issuer_company.name }}</td>
+                        <td>{{ note.purchaser_company.name }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ note.issuer_company.address.street_name }} {{ note.issuer_company.address.house_number }}</td>
+                        <td>{{ note.purchaser_company.address.street_name }} {{ note.purchaser_company.address.house_number }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ note.issuer_company.address.zip_code }} {{ note.issuer_company.address.city_name }}</td>
+                        <td>{{ note.purchaser_company.address.zip_code }} {{ note.purchaser_company.address.city_name }}</td>
+                    </tr>
+                    <tr>
+                        <td>NIP: {{ note.issuer_company.tax_id }}</td>
+                        <td>NIP: {{ note.purchaser_company.tax_id }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="row mt-5 mb-5">
+            <div class="col-12">
+                <table class="table table-bordered">
+                    <thead class="text-center">
+                        <th style="width: 10%">L.P</th>
+                        <th style="width: 10%">Obciazylismy</th>
+                        <th style="width: 10%">Waluta</th>
+                        <th>Tresc</th>
+                    </thead>
+                    {% for position in note.positions.all %}
+                        <tr>
+                            <td></td>
+                            <td class="text-center">{{ position.amount }}</td>
+                            <td>{{ position.currency }}</td>
+                            <td>{{ position.description }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+        <div class="row" style="margin-bottom: 18rem">
+            <div class="col-12">
+                <p>Razem: {{ note.total_amount }} {{ note.currency }}</p>
+                <p>Numer rachunku: {{ note.bank_account.account_number }} {{ note.bank_account.bank_name }}; {{ note.bank_account.extra_parameters }}</p>
+                <hr style="color: black; height: 2px">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <table style="width: 100%">
+                    <tr class="text-center">
+                        <td style="width: 50%;">Wystawca</td>
+                        <td>Adresat</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+  </body>
+</html>

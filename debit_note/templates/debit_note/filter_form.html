@@ -1,0 +1,63 @@
+
+<form action="" class="list-group">
+    <div class="accordion" id="accordionExample">
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingOne">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+            Статус
+          </button>
+        </h2>
+        <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+          <div class="accordion-body">
+                <input type="checkbox" id="paid_true" style="float: left; margin-left: 5px" name="is_paid" value="True" {% if view.filter_get_context.true %}checked{% endif %}>
+                <label for="paid_true" style="float: left; margin-left: 5px">Оплачено</label>
+            <br>
+                <input style="float: left; margin-left: 5px" type="checkbox" id="paid_false" name="is_paid" value="False" {% if view.filter_get_context.false %}checked{% endif %}>
+                <label style="float: left; margin-left: 5px" for="paid_false">Не оплачено</label>
+            <br>
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingTwo">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+            Год
+          </button>
+        </h2>
+        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+          <div class="accordion-body">
+              {% for year in view.get_all_years %}
+               <input style="float: left; margin-left: 5px" type="checkbox" id="{{ year }}" name="year" value="{{ year }}" {% if year in view.filter_get_context %}checked{% endif %}>
+               <label style="float: left; margin-left: 5px" for="{{ year }}">{{ year }}</label>
+                <br>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingThree">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+            Месяц
+          </button>
+        </h2>
+        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+          <div class="accordion-body">
+              {% for month in view.get_all_months %}
+                    <input style="float: left; margin-left: 5px" type="checkbox" id='{{ month|date:"n" }}' name="month" value='{{ month|date:"n" }}' {% if month|date:"n" in view.filter_get_context %}checked{% endif %}>
+                    <label style="float: left; margin-left: 5px" for='{{ month|date:"n" }}'>{{ month|date:"E"|capfirst }}</label>
+                <br>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <input class="btn btn-sm btn-secondary mt-2" type="submit" value="Показать">
+    {% if object %}
+    <a class="btn btn-sm btn-secondary mt-2" href="{% url request.resolver_match.url_name object.pk %}">Сбросить фильтры</a>
+    {% else %}
+    <a class="btn btn-sm btn-secondary mt-2" href="{% url request.resolver_match.url_name %}">Сбросить фильтры</a>
+    {% endif %}
+</form>
+
+
+

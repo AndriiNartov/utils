@@ -1,0 +1,27 @@
+{% extends 'debit_note/base.html' %}
+{% load crispy_forms_tags %}
+
+
+
+{% block content %}
+
+<div class="row">
+    <div class="col">
+        <table class="table table-bordered">
+            <thead class="text-center">
+                <th>Название</th>
+                <th>Адрес</th>
+                <th>VAT ID</th>
+            </thead>
+            {% for issuer in issuers %}
+                <tr>
+                    <td><a href="{% url 'issuer_detail' issuer.pk %}" title="Посмотреть детали">{{ issuer.name }}</a></td>
+                    <td>{{ issuer.address }}</td>
+                    <td>{{ issuer.tax_id }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+{% endblock %}

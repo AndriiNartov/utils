@@ -1,0 +1,74 @@
+{% extends 'debit_note/base.html' %}
+{% load crispy_forms_tags %}
+{% load bootstrap5 %}
+
+
+{% block content %}
+
+<div class="row">
+    {% if tax_id %}
+    <div class="col-1">
+        <a class="btn btn-lg btn-secondary-inline" href="{% url 'purchaser_all' %}" title="Назад к списку покупателей"><i class="fas fa-chevron-circle-left"></i></a>
+    </div>
+    {% endif %}
+    <div class="col">
+        <form class="row g-3 justify-content-center" action="">
+            <div class="col-auto">
+            <input class="form-control" placeholder="Номер VAT фирмы" type="search" name="tax_id">
+            </div>
+            <div class="col-auto">
+            {% bootstrap_button "Искать" button_type="submit" button_class="btn btn-secondary"  %}
+            </div>
+        </form>
+    </div>
+</div>
+{% if not tax_id %}
+<div class="row mt-3">
+    <div class="col">
+        <table class="table table-bordered">
+            <thead class="text-center">
+                <th>Название</th>
+                <th>Адрес</th>
+                <th>VAT ID</th>
+            </thead>
+            {% for purchaser in purchasers %}
+                <tr>
+                    <td><a href="{% url 'purchaser_detail' purchaser.pk %}" title="Посмотреть детали">{{ purchaser.name }}</a></td>
+                    <td>{{ purchaser.address }}</td>
+                    <td>{{ purchaser.tax_id }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+{% else %}
+{% if  search_purchaser %}
+<div class="row mt-3">
+    <div class="col text-center"><h4>Результаты поиска</h4></div>
+</div>
+<div class="row mt-3">
+    <div class="col">
+        <table class="table table-bordered">
+            <thead class="text-center">
+                <th>Название</th>
+                <th>Адрес</th>
+                <th>VAT ID</th>
+            </thead>
+                <tr>
+                    <td><a href="{% url 'purchaser_detail' search_purchaser.pk %}" title="Посмотреть детали">{{ search_purchaser.name }}</a></td>
+                    <td>{{ search_purchaser.address }}</td>
+                    <td>{{ search_purchaser.tax_id }}</td>
+                </tr>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="row mt-3">
+    <div class="col text-center">
+        <h4>В базе нет компаний с налоговым номером "{{ tax_id }}"</h4>
+    </div>
+</div>
+{% endif %}
+{% endif %}
+
+{% endblock %}

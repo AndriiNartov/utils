@@ -1,0 +1,27 @@
+{% extends 'debit_note/base.html' %}
+{% load bootstrap5 %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col">
+        {% if main_company_as_issuer_not_exists %}
+        <a href="{% url 'issuer_create' %}?tax_id={{ main_company_tax_id }}">
+            Использовать данные компании "{{ main_company_name }}" как шаблон
+        </a>
+    {% endif %}
+        <form action="" method="post">
+        {% csrf_token %}
+        {% bootstrap_field form.company_creator %}
+        {% bootstrap_field form.name %}
+        {% bootstrap_field address_form.street_name %} {% bootstrap_field address_form.house_number %}
+        {% bootstrap_field address_form.zip_code %} {% bootstrap_field address_form.city_name %}
+        {% bootstrap_field form.tax_id %}
+        {% bootstrap_field form.phone %}
+        {% bootstrap_field form.chosen_by_default %}
+        {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
+    </form>
+    </div>
+</div>
+
+{% endblock %}

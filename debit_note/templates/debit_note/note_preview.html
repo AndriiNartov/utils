@@ -1,0 +1,123 @@
+{% extends 'debit_note/base.html' %}
+{% load bootstrap5 %}
+
+{% block title %}{{ note.number }}{% endblock %}
+
+{% block content %}
+
+<div class="card border-dark p-3">
+    <div class="row">
+        <div class="col-9">
+            <a class="btn btn-primary-inline btn-lg" href="{% url 'update_note' note.pk %}" title="Редактировать ноту"><i class="fas fa-edit"></i></a>
+            <a class="btn btn-primary-inline btn-lg" href="{% url 'download_note_pdf' note.pk %}" title="Скачать в формате PDF"><i class="far fa-file-pdf"></i></a>
+            <a class="btn btn-primary-inline btn-lg" href="{% url 'show_note_for_print' note.pk %}" target="blank" title="Открыть версию для печати"><i class="fas fa-print"></i></a>
+            <button title="Удалить ноту" type="button" class="btn btn-primary-inline btn-lg" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fas fa-trash-alt"></i></button>
+        </div>
+        <div class="col-3">
+            <form class="mt-2" action="">
+                {% if paid %}
+                    {% bootstrap_button "Убрать оплату" button_type="submit" button_class="btn-danger btn-sm" %}
+                    <input type="hidden" name="paid" value="False">
+                {% else %}
+                    {% bootstrap_button "Обозначить оплату" button_type="submit" button_class="btn-secondary btn-sm" %}
+                    <input type="hidden" name="paid" value="True">
+                {% endif %}
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 text-center">
+            <table class="table table-bordered mt-5">
+                <tr>
+                    <td style="width: 50%">Nota obciazeniowa</td>
+                    <td>NR {{ note.number }}</td>
+                </tr>
+                <tr>
+                    <td>Data wystawienia:<br>{{ note.issue_date|date:"d/m/Y" }}</td>
+                    <td>Termin platnosci:<br>{{ note.payment_deadline_date|date:"d/m/Y" }}</td>
+                </tr>
+                <tr>
+                    <td>Metoda platnosci: {{ note.payment_method }}</td>
+                    <td>Oryginal</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <table style="width: 100%">
+                <tr>
+                    <td>Wystawca:</td>
+                    <td>Nabywca:</td>
+                </tr>
+                <tr>
+                    <td style="width: 50%">{{ note.issuer_company.name }}</td>
+                    <td>{{ note.purchaser_company.name }}</td>
+                </tr>
+                <tr>
+                    <td>{{ note.issuer_company.address.street_name }} {{ note.issuer_company.address.house_number }}</td>
+                    <td>{{ note.purchaser_company.address.street_name }} {{ note.purchaser_company.address.house_number }}</td>
+                </tr>
+                <tr>
+                    <td>{{ note.issuer_company.address.zip_code }} {{ note.issuer_company.address.city_name }}</td>
+                    <td>{{ note.purchaser_company.address.zip_code }} {{ note.purchaser_company.address.city_name }}</td>
+                </tr>
+                <tr>
+                    <td>NIP: {{ note.issuer_company.tax_id }}</td>
+                    <td>NIP: {{ note.purchaser_company.tax_id }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="row mt-5 mb-5">
+        <div class="col-12">
+            <table class="table table-bordered">
+                <thead class="text-center">
+                    <th style="width: 10%">L.P</th>
+                    <th style="width: 10%">Obciazylismy</th>
+                    <th style="width: 10%">Waluta</th>
+                    <th>Tresc</th>
+                </thead>
+                {% for position in note.positions.all %}
+                    <tr>
+                        <td></td>
+                        <td class="text-center">{{ position.amount }}</td>
+                        <td class="text-center">{{ position.currency }}</td>
+                        <td>{{ position.description }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <p>Razem: {{ note.total_amount }} {{ note.currency }}</p>
+            <p>Numer rachunku: {{ note.bank_account.account_number }} {{ note.bank_account.bank_name }}; {{ note.bank_account.extra_parameters }}</p>
+            <hr style="color: black; height: 2px">
+        </div>
+    </div>
+    <!--Modal-->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Подтверждение удаления</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            Действительно хотите удалить ноту "{{ note.number }}"?
+          </div>
+          <div class="modal-footer">
+              <form action="{% url 'delete_note' note.pk %}" method="post">
+                  {% csrf_token %}
+                  <input class="btn btn-danger" type="submit" value="Удалить">
+              </form>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--End Modal-->
+</div>
+
+{% endblock %}

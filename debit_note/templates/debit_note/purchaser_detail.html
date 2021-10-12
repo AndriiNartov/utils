@@ -1,0 +1,88 @@
+{% extends 'debit_note/base.html' %}
+
+{% block content %}
+
+
+
+<div class="row">
+    <div class="col">
+        <table class="table table-bordered">
+            <thead class="text-center">
+                <th>Название</th>
+                <th>Адрес</th>
+                <th>VAT ID</th>
+            </thead>
+                <tr>
+                    <td><a href="{% url 'purchaser_update' purchaser.pk %}" title="Редактировать данные">{{ purchaser.name }}</a></td>
+                    <td>{{ purchaser.address }}</td>
+                    <td>{{ purchaser.tax_id }}</td>
+                </tr>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <button title="Удалить фирму" type="button" class="btn btn-primary-inline btn-lg" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fas fa-trash-alt"></i></button>
+    </div>
+</div>
+<div class="row mt-2">
+    <div class="col text-center">
+        {% if not purchaser.debitnote_set.exists %}
+            <h5>Для "{{ purchaser.name }}" еще нет выставленных нот.</h5>
+        {% else %}
+            <h4>Ноты для "{{ purchaser.name }}"</h4>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <table class="table table-bordered text-center table-hover">
+            <thead>
+                <th>Номер</th>
+                <th>Дата выставления</th>
+                <th>Дата оплаты</th>
+            </thead>
+            {% for note in view.filter_get_queryset %}
+                <tr {% if note.is_paid %}class="table-success"{% else %}class="table-secondary"{% endif %}>
+                    <td><a href="{% url 'preview' note.pk %}" title="Посмотреть детали">{{ note.number }}</a></td>
+                    <td>{{ note.issue_date|date:"d-m-Y" }}</td>
+                    <td>{{ note.payment_deadline_date|date:"d-m-Y" }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+        <form action="{% url 'create_note' %}">
+            <input class="btn btn-primary" type="submit" value="Создать ноту">
+            <input type="hidden" name="tax_id" value="{{ purchaser.tax_id }}">
+        </form>
+    </div>
+</div>
+
+<!--Modal-->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Подтверждение удаления</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Действительно хотите удалить фирму "{{ purchaser.name }}"?
+      </div>
+      <div class="modal-footer">
+          <form action="{% url 'purchaser_delete' purchaser.pk %}" method="post">
+              {% csrf_token %}
+              <input class="btn btn-danger" type="submit" value="Удалить">
+          </form>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!--End Modal-->
+
+
+{% endblock %}
+
+{% block filter %}
+    {% include 'debit_note/filter_form.html' %}
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends 'debit_note/base.html' %}
+{% load bootstrap5 %}
+
+{% block content %}
+
+
+<div class="row">
+    <div class="col">
+        <form class="row g-3 justify-content-center" action="{% url 'purchaser_create' %}">
+            <div class="col-auto">
+            <input class="form-control" placeholder="Номер VAT фирмы" type="search" name="tax_id" {% if tax_id %}value="{{ tax_id }}"{% endif %}>
+            </div>
+            {% if next %}
+                <input type="hidden" name="next" value="{{ next }}">
+            {% endif %}
+            <div class="col-auto">
+            {% bootstrap_button "Искать" button_type="submit" button_class="btn btn-secondary"  %}
+            </div>
+        </form>
+    </div>
+</div>
+{% if purchaser_in_db %}
+<div class="row mt-3">
+    <div class="col text-center">
+        <h3>В базе Ваших клиентов уже находится компания с номером {{ purchaser_in_db.tax_id }}</h3>
+        <table class="table table-bordered">
+            <thead class="text-center">
+                <th>Название</th>
+                <th>Адрес</th>
+                <th>VAT ID</th>
+            </thead>
+                <tr>
+                    <td>{{ purchaser_in_db.name }}</td>
+                    <td>{{ purchaser_in_db.address }}</td>
+                    <td>{{ purchaser_in_db.tax_id }}</td>
+                </tr>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <form action="{% url 'create_note' %}">
+        <input class="btn btn-primary" type="submit" value="Создать ноту">
+        <input type="hidden" name="tax_id" value="{{ purchaser_in_db.tax_id }}">
+    </form>
+</div>
+{% else %}
+    {% if api_connection_error %}
+        <div class="row mt-3 text-center">
+            <div class="col">
+                <h5>Компания с налоговым номером "{{ tax_id }}" не найдена.</h5>
+                <h5>Введите корректный номер или заполните данные вручную.</h5>
+            </div>
+        </div>
+    {% endif %}
+    <div class="row align-items-center">
+        <div class="col">
+            <form action="" method="post">
+            {% csrf_token %}
+            {% bootstrap_field form.company_creator  %}
+            {% bootstrap_field form.name %}
+            {% bootstrap_field address_form.street_name %} {% bootstrap_field address_form.house_number %}
+            {% bootstrap_field address_form.zip_code %} {% bootstrap_field address_form.city_name %}
+            {% bootstrap_field form.tax_id %}
+            {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
+        </form>
+        </div>
+    </div>
+{% endif %}
+
+{% endblock %}

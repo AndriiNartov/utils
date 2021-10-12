@@ -1,0 +1,48 @@
+{% extends 'debit_note/base.html' %}
+{% load crispy_forms_tags %}
+{% load bootstrap5 %}
+
+{% block content %}
+
+
+<div class="row">
+    <div class="col">
+        {% if view.filter_get_queryset %}
+        <table class="table table-bordered text-center table-hover table-dark table-striped">
+            <thead>
+                <th>Номер</th>
+                <th>Дата выставления</th>
+                <th>Дата оплаты</th>
+                <th>Плательщик</th>
+            </thead>
+            {% for note in view.filter_get_queryset %}
+                <tr {% if note.is_paid %}class="table-success"{% endif %}>
+                    <td><a href="{% url 'preview' note.pk %}" title="Посмотреть детали">{{ note.number }}</a></td>
+                    <td>{{ note.issue_date|date:"d-m-Y" }}</td>
+                    <td>{{ note.payment_deadline_date|date:"d-m-Y" }}</td>
+                    <td>{{ note.purchaser_company.name }}</td>
+                </tr>
+            {% endfor %}
+            {% else %}
+            <hr>
+            <h4 class="text-center">Нет результатов, удовлетворяющих условиям фильтрации</h4>
+            <hr>
+        </table>
+        {% endif %}
+    </div>
+</div>
+{% if paginator.page_range|length > 1 %}
+    <div class="pagination">
+        <div class="row">
+            <div class="col">
+                {% bootstrap_pagination page_obj pages_to_show='3' size="small" %}
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+{% endblock %}
+
+{% block filter %}
+    {% include 'debit_note/filter_form.html' %}
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends 'debit_note/base.html' %}
+{% load bootstrap5 %}
+
+{% block content %}
+
+
+
+<div class="row ">
+    <div class="col">
+        <table class="table table-bordered">
+            <thead class="text-center">
+                <th>Название</th>
+                <th>Адрес</th>
+                <th>VAT ID</th>
+            </thead>
+                <tr>
+                    <td><a href="{% url 'issuer_update' issuer.pk %}" title="Редактировать данные">{{ issuer.name }}</a></td>
+                    <td>{{ issuer.address }}</td>
+                    <td>{{ issuer.tax_id }}</td>
+                </tr>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <button title="Удалить фирму" type="button" class="btn btn-primary-inline btn-lg" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fas fa-trash-alt"></i></button>
+    </div>
+</div>
+<div class="row">
+    <div class="col text-center">
+        <h4>Счета:</h4>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+            <div>
+                <form action="" method="post">
+                {% csrf_token %}
+                    <table class="table table-bordered">
+                        <thead>
+                            <th>Название</th>
+                            <th>Номер</th>
+                            <th>Банк</th>
+                            <th>Доп. параметры</th>
+                        </thead>
+                        {% for account in issuer.bank_accounts.all %}
+                            <tr>
+                                <td>{{ account.name }}</td>
+                                <td>{{ account.account_number }}</td>
+                                <td>{{ account.bank_name }}</td>
+                                <td>{{ account.extra_parameters }}</td>
+                            </tr>
+                        {% endfor %}
+                            <tr>
+                                {% for field in form %}
+                                <td>{% bootstrap_field field field_class="form-control-sm" show_label=False %}</td>
+                                {% endfor %}
+                            </tr>
+                    </table>
+                    <div class="row mt-3">
+                        <div class="col">
+                            {% bootstrap_button "Сохранить" button_type="submit" button_class="btn btn-sm btn-primary" %}
+                            <a class="btn btn-sm btn-secondary" href="{% url 'issuer_detail' issuer.pk %}">Отмена</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+    </div>
+</div>
+
+<!--Modal-->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Подтверждение удаления</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Действительно хотите удалить фирму "{{ issuer.name }}"?
+      </div>
+      <div class="modal-footer">
+          <form action="{% url 'issuer_delete' issuer.pk %}" method="post">
+              {% csrf_token %}
+              <input class="btn btn-danger" type="submit" value="Удалить">
+          </form>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!--End Modal-->
+
+{% endblock %}
+
+
+<form action="" method="post">
+{% csrf_token %}
+{% bootstrap_form form %}
+{% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
+</form>

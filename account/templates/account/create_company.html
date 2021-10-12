@@ -1,0 +1,21 @@
+{% extends 'account/base.html' %}
+{% load bootstrap5 %}
+
+
+{% block base_content %}
+
+
+<div class="row mt-5 justify-content-center">
+    <div class="col-6">
+        <h2 class="text-center">Создание учётной записи компании</h2>
+        <form action="" method="post">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            {% bootstrap_form address_form %}
+            {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
+        </form>
+    </div>
+</div>
+
+
+{% endblock %}
