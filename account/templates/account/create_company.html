@@ -6,6 +6,7 @@
 
 
 <div class="row mt-5 justify-content-center">
+    {% if not has_company %}
     <div class="col-6">
         <h2 class="text-center">Создание учётной записи компании</h2>
         <form action="" method="post">
@@ -15,6 +16,12 @@
             {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
         </form>
     </div>
+    {% else %}
+    <div class="col-12">
+        <h2 class="text-center">Вы уже являетесь администратором компании "{{ request.user.company }}". Каждый пользователь может быть связан только с одной компанией.</h2>
+    </div>
+    {% endif %}
+
 </div>
 
 

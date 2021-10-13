@@ -1,0 +1,49 @@
+{% extends 'account/base.html' %}
+{% load bootstrap5 %}
+
+{% block base_content %}
+
+
+<div class="row mt-5">
+    <div class="col-4">
+        Моя Компания
+        <p>{{ company }}</p>
+    </div>
+    <div class="col-4">
+        Подтвержденные
+        {% for user in active_users %}
+        <p>{{ user }}</p>
+        {% endfor %}
+    </div>
+    <div class="col-4">
+        <button type="button" class="btn btn-sm btn-primary position-relative">
+            Ожидающие подтверждения
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            {{ not_confirmed_users.count }}
+          </span>
+        </button>
+        {% for user in not_confirmed_users %}
+        <p>{{ user }}</p>
+        {% endfor %}
+    </div>
+</div>
+
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <a class="nav-link active" aria-current="page" href="#">Active</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="#">Link</a>
+  </li>
+  <li class="nav-item position-relative">
+    <a class="nav-link" href="#">Link</a>
+    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+        {{ not_confirmed_users.count }}
+    </span>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+  </li>
+</ul>
+
+{% endblock %}

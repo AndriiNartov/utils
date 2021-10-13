@@ -5,8 +5,8 @@ charset-normalizer==2.0.6
 Django==3.2.7
 django-bootstrap-v5==1.0.5
 django-crispy-forms==1.12.0
+gunicorn==20.1.0
 idna==3.2
-pkg_resources
 python-pdf==0.38
 pytz==2021.1
 requests==2.26.0

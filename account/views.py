@@ -1,8 +1,11 @@
 from django.contrib.auth.views import LoginView
-from django.http import HttpResponseRedirect, HttpResponse
-from django.shortcuts import render
+from django.contrib import messages
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden
+from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.generic import CreateView, DetailView
+from django.views.generic.base import ContextMixin
 
 from .models import User, MainCompany
 from .forms import AddressCreateForm, MainCompanyCreateForm, RegisterUserForm
@@ -40,6 +43,7 @@ class RegisterUserByInvitationView(RegisterUserView):
             try:
                 company = MainCompany.objects.get(invitation_link_suffix=invitation_link_suffix)
                 new_user.company = company
+                new_user.is_active = False
                 new_user.save()
                 return HttpResponseRedirect(reverse_lazy('login'))
             except:
@@ -56,6 +60,12 @@ class MainCompanyCreateView(CreateView):
         context = super().get_context_data(**kwargs)
         context['address_form'] = AddressCreateForm()
         return context
+
+    def get(self, *args, **kwargs):
+        if self.request.user.company:
+            messages.add_message(self.request, messages.INFO, f'Вы уже зарегистрированы в компании "{self.request.user.company}"')
+            return redirect('company_detail', self.request.user.company.pk)
+        return super().get(*args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
@@ -85,3 +95,25 @@ class MainCompanyDetailView(DetailView):
 
 class LoginUserView(LoginView):
     template_name = 'account/login.html'
+
+
+class MainCompanyManageView(ContextMixin, View):
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        company = self.request.user.company
+        context['company'] = company
+        context['active_users'] = User.objects.filter(
+            company=company,
+            is_confirmed_by_admin=True
+        )
+        context['not_confirmed_users'] = User.objects.filter(
+            company=company,
+            is_confirmed_by_admin=False
+        )
+        return context
+
+    def get(self, *args, **kwargs):
+        if not self.request.user.is_company_admin:
+            return HttpResponseForbidden()
+        return render(self.request, 'account/company_manage.html', self.get_context_data())
