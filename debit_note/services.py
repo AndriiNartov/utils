@@ -44,6 +44,11 @@ def create_note_in_pdf(template_src, debit_note_pk):
     html_content = template.render({'note': debit_note})
     new_pdf_file_name = f"{debit_note.number.replace('/', '_')}.pdf"
     pdf_content = pydf.generate_pdf(html_content)
+
+    from io import BytesIO
+    bytes_ = BytesIO(pdf_content)
+    bytes_name = new_pdf_file_name
+
     with open(f'{new_pdf_file_name}', 'wb') as f:
         f.write(pdf_content)
     return new_pdf_file_name
