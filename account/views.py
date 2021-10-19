@@ -4,11 +4,11 @@ from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidde
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import CreateView, DetailView
+from django.views.generic import CreateView, DetailView, ListView
 from django.views.generic.base import ContextMixin
 
 from .models import User, MainCompany
-from .forms import AddressCreateForm, MainCompanyCreateForm, RegisterUserForm
+from .forms import AddressCreateForm, MainCompanyCreateForm, RegisterUserForm, UnconfirmedUsersFormset
 
 
 class RegisterUserView(CreateView):
@@ -117,3 +117,39 @@ class MainCompanyManageView(ContextMixin, View):
         if not self.request.user.is_company_admin:
             return HttpResponseForbidden()
         return render(self.request, 'account/company_manage.html', self.get_context_data())
+
+
+class UnconfirmedUsersView(ContextMixin, View):
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        company = self.request.user.company
+        context['company'] = company
+        context['active_users'] = User.objects.filter(
+            company=company,
+            is_confirmed_by_admin=True
+        )
+        context['not_confirmed_users'] = User.objects.filter(
+            company=company,
+            is_confirmed_by_admin=False
+        )
+        context['formset'] = UnconfirmedUsersFormset(queryset=self.get_queryset())
+        return context
+
+    def get_queryset(self):
+        return User.objects.filter(company=self.request.user.company, is_confirmed_by_admin=False)
+
+    def get(self, request, *args, **kwargs):
+        # formset = UnconfirmedUsersFormset(queryset=self.get_queryset())
+        return render(request, 'account/unconfirmed_users.html', self.get_context_data())
+
+    def post(self, *args, **kwargs):
+        formset = UnconfirmedUsersFormset(self.request.POST)
+        if formset.is_valid():
+            for form in formset:
+                if form.cleaned_data['is_confirmed_by_admin']:
+                    user = form.save(commit=False)
+                    user.is_active = True
+                    user.save()
+                    return redirect('company_manage')
+        return render(self.request, 'account/unconfirmed_users.html', {'formset': formset})

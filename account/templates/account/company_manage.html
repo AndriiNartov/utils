@@ -15,35 +15,27 @@
         <p>{{ user }}</p>
         {% endfor %}
     </div>
-    <div class="col-4">
-        <button type="button" class="btn btn-sm btn-primary position-relative">
-            Ожидающие подтверждения
-          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-            {{ not_confirmed_users.count }}
-          </span>
-        </button>
-        {% for user in not_confirmed_users %}
-        <p>{{ user }}</p>
-        {% endfor %}
-    </div>
 </div>
 
 <ul class="nav nav-tabs">
   <li class="nav-item">
-    <a class="nav-link active" aria-current="page" href="#">Active</a>
+    <a class="nav-link {% if request.resolver_match.url_name == 'company_manage' %}active{% endif %}" href="{% url 'company_manage' %}" aria-current="page" href="#">Компания</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="#">Link</a>
+    <a class="nav-link" href="#">Активные пользователи</a>
   </li>
   <li class="nav-item position-relative">
-    <a class="nav-link" href="#">Link</a>
+    <a class="nav-link {% if request.resolver_match.url_name == 'unconfirmed_users' %}active{% endif %}" href="{% url 'unconfirmed_users' %}">Ожидают подтверждения</a>
     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-        {{ not_confirmed_users.count }}
+        {% if not_confirmed_users %}{{ not_confirmed_users.count }}{% endif %}
     </span>
   </li>
   <li class="nav-item">
     <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
   </li>
 </ul>
+{% block content %}
+{% endblock %}
 
 {% endblock %}
+

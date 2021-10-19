@@ -6,6 +6,12 @@ from django.forms import modelformset_factory
 from .models import User, MainCompany, Address
 
 
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = '__all__'
+
+
 class RegisterUserForm(forms.ModelForm):
     password1 = forms.CharField(
         label='Пароль',
@@ -64,3 +70,11 @@ class MainCompanyCreateForm(forms.ModelForm):
         fields = ('name', 'phone', 'tax_id')
 
 
+UnconfirmedUsersFormset = modelformset_factory(
+    User,
+    fields=('username', 'is_confirmed_by_admin',),
+    widgets={
+            'is_confirmed_by_admin': forms.CheckboxInput(attrs={'id': 'is_confirmed_by_admin'})
+        },
+    extra=0,
+)

@@ -1,4 +1,4 @@
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.http import HttpResponseRedirect, FileResponse, HttpResponseForbidden
 from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse_lazy, reverse
@@ -11,7 +11,7 @@ from .models import DebitNote, PurchaserCompany, IssuerCompany, BankAccount, Pay
 from .forms import DebitNoteCreateForm, IssuerCompanyCreateForm, PurchaserCompanyCreateForm, PositionCreateForm, \
     PositionInlineFormset, BankAccountCreateForm, PaymentMethodFormset, CurrencyFormset, IssuerCompanyFormset, \
     PurchaserCompanyUpdateForm, IssuerCompanyUpdateForm, PaymentMethodCreateForm, CurrencyCreateForm
-from .services import create_note_in_pdf, CompanyDetailsFromAPIRequest, set_correct_queryset_for_currency, \
+from .services import convert_html_to_pdf, CompanyDetailsFromAPIRequest, set_correct_queryset_for_currency, \
     assign_fields_for_new_note
 from account.forms import AddressCreateForm
 
@@ -187,8 +187,10 @@ class IssuerCompanyUpdateView(CompanyCreatorPermissionMixin, UpdateView):
         form = self.form_class(request.POST, instance=company)
         address_form = self.address_form(request.POST, instance=company.address)
         context = {'form': form, 'address_form': address_form}
+        print(form)
         pk = self.kwargs.get('pk')
         if form.is_valid() and address_form.is_valid():
+            print('valid')
             address_form.save()
             company.save()
             return redirect('issuer_detail', pk)
@@ -353,6 +355,19 @@ class PurchaserCompanyDetailView(CompanyCreatorPermissionMixin, DebitNoteFilterM
     template_name = 'debit_note/purchaser_detail.html'
     context_object_name = 'purchaser'
 
+    def filter_get_queryset(self):
+        queryset = DebitNote.objects.filter(company_creator=self.request.user.company, purchaser_company=self.kwargs['pk'])
+        queries = list()
+        if self.request.GET.get('year'):
+            queries.append(Q(issue_date__year__in=self.request.GET.getlist('year')))
+        if self.request.GET.get('month'):
+            queries.append(Q(issue_date__month__in=self.request.GET.getlist('month')))
+        if self.request.GET.get('is_paid'):
+            queries.append(Q(is_paid__in=self.request.GET.getlist('is_paid')))
+        for query in queries:
+            queryset = queryset.filter(query)
+        return queryset
+
 
 class PurchaserCompanyListView(ListView):
     template_name = 'debit_note/purchasers_list.html'
@@ -377,8 +392,8 @@ class PurchaserCompanyDeleteView(CompanyCreatorPermissionMixin, DeleteView):
 
 
 def download_note_in_pdf(request, pk):
-    new_pdf_filename = create_note_in_pdf('debit_note/note_for_print_and_pdf.html', pk)
-    return FileResponse(open(new_pdf_filename, 'rb'), as_attachment=True)
+    path_to_pdf_file = convert_html_to_pdf('debit_note/note_for_print_and_pdf.html', pk, request)
+    return FileResponse(open(path_to_pdf_file, 'rb'), as_attachment=True)
 
 
 class DebitNoteShowHTMLForPrintView(CompanyCreatorPermissionMixin, DetailView):

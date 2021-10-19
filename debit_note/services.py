@@ -1,12 +1,12 @@
 import requests
 from django import forms
 from django.template.loader import get_template
-import pydf
 from string import digits
 from datetime import datetime
 
 from utils.settings import COMPANY_SEARCH_API_DETAIL_URL, COMPANY_SEARCH_API_DETAIL_QUERY_PARAM
 from .models import DebitNote, Currency
+import os
 
 
 def create_debit_note_number(issue_date, request):
@@ -38,20 +38,55 @@ def assign_fields_for_new_note(new_note, new_position, request):
     new_note.positions.add(new_position)
 
 
-def create_note_in_pdf(template_src, debit_note_pk):
-    debit_note = DebitNote.objects.get(pk=debit_note_pk)
+# def create_note_in_pdf(template_src, debit_note_pk):
+#     debit_note = DebitNote.objects.get(pk=debit_note_pk)
+#     template = get_template(template_src)
+#     html_content = template.render({'note': debit_note})
+#     new_pdf_file_name = f"{debit_note.number.replace('/', '_')}.pdf"
+#     pdf_content = pydf.generate_pdf(html_content)
+#
+#     from io import BytesIO
+#     bytes_ = BytesIO(pdf_content)
+#     bytes_name = new_pdf_file_name
+#
+#     with open(f'{new_pdf_file_name}', 'wb') as f:
+#         f.write(pdf_content)
+#     return new_pdf_file_name
+def create_temp_company_directory(company_name):
+    if not 'tmp' in os.listdir():
+        os.mkdir('tmp')
+    company_name_for_directory = company_name.lower().replace(' ', '_')
+    if not company_name_for_directory in os.listdir('tmp/'):
+        os.mkdir(f'tmp/{company_name_for_directory}')
+    return company_name_for_directory
+
+
+def create_filenames_for_pdf_and_html(note_number):
+    pdf_filename = f"{note_number.replace('/', '_')}.pdf"
+    html_filename = f"{note_number.replace('/', '_')}.html"
+    return pdf_filename, html_filename
+
+
+def create_pdf_and_html_files(debit_note, template_src, directory_name):
+    pdf_filename, html_filename = create_filenames_for_pdf_and_html(debit_note.number)
+    new_pdf_file = open(f'tmp/{directory_name}/{pdf_filename}', 'wb')
+    new_pdf_file.close()
     template = get_template(template_src)
     html_content = template.render({'note': debit_note})
-    new_pdf_file_name = f"{debit_note.number.replace('/', '_')}.pdf"
-    pdf_content = pydf.generate_pdf(html_content)
+    with open(f'tmp/{directory_name}/{html_filename}', 'wb') as html:
+        html.write(html_content.encode())
+    return pdf_filename, html_filename
 
-    from io import BytesIO
-    bytes_ = BytesIO(pdf_content)
-    bytes_name = new_pdf_file_name
 
-    with open(f'{new_pdf_file_name}', 'wb') as f:
-        f.write(pdf_content)
-    return new_pdf_file_name
+def convert_html_to_pdf(template_src, debit_note_pk, request):
+    company_name = request.user.company.name
+    company_name_for_dir = create_temp_company_directory(company_name)
+    debit_note = DebitNote.objects.get(pk=debit_note_pk)
+    new_pdf_file_name, new_html_file_name = create_pdf_and_html_files(debit_note, template_src, company_name_for_dir)
+    path_to_html = f'tmp/{company_name_for_dir}/{new_html_file_name}'
+    path_to_pdf = f'tmp/{company_name_for_dir}/{new_pdf_file_name}'
+    os.system(f'wkhtmltopdf {path_to_html} {path_to_pdf}')
+    return path_to_pdf
 
 
 class CompanyDetailsFromAPIRequest:

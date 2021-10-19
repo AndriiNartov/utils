@@ -6,7 +6,8 @@ from .views import LoginUserView,\
     MainCompanyDetailView,\
     RegisterUserView,\
     RegisterUserByInvitationView, \
-    MainCompanyManageView
+    MainCompanyManageView, \
+    UnconfirmedUsersView
 
 
 
@@ -18,4 +19,5 @@ urlpatterns = [
     path('company/create/', MainCompanyCreateView.as_view(), name='create_company'),
     path('company/<int:pk>/', MainCompanyDetailView.as_view(), name='company_detail'),
     path('company/manage/', MainCompanyManageView.as_view(), name='company_manage'),
+    path('company/manage/unconfirmed/', UnconfirmedUsersView.as_view(), name='unconfirmed_users'),
 ]
