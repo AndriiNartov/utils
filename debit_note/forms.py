@@ -43,12 +43,13 @@ class DebitNoteCreateForm(forms.ModelForm):
         initial=datetime.datetime.now().date(),
         label='Дата выставления'
     )
-    purchaser_company = forms.ModelChoiceField(
-        widget=forms.Select,
-        queryset=PurchaserCompany.objects.all().order_by('name'),
+    purchaser_company = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'id': 'tax_id',
+                'autocomplete': 'off'
+            }),
         label='Плательщик',
-        empty_label='Выберите компанию-плательщика',
-        help_text='Если в списке нет необходимой фирмы, нажмите "Добавить фирму"'
     )
     issuer_company = forms.ModelChoiceField(
         widget=forms.Select,
@@ -70,9 +71,9 @@ class DebitNoteCreateForm(forms.ModelForm):
         self.company_creator = kwargs.pop('company_creator')
         super().__init__(*args, **kwargs)
         self.fields['issuer_company'].queryset = IssuerCompany.objects.filter(company_creator=self.company_creator)
-        self.fields['purchaser_company'].queryset = PurchaserCompany.objects.filter(company_creator=self.company_creator)
         self.fields['bank_account'].queryset = BankAccount.objects.filter(owner__company_creator=self.company_creator)
         self.fields['payment_method'].queryset = PaymentMethod.objects.filter(company_creator=self.company_creator)
+        self.fields['purchaser_company'].widget.attrs['data-creator'] = self.company_creator.pk
 
     def clean_bank_account(self):
         bank_account_from_filed = self.cleaned_data['bank_account']
@@ -80,6 +81,14 @@ class DebitNoteCreateForm(forms.ModelForm):
         if not bank_account_from_filed.owner == issuer_company_from_field:
             raise forms.ValidationError('Номер счёта должен принадлежать фирме, от имени которой выставляется нота')
         return bank_account_from_filed
+
+    def clean_purchaser_company(self):
+        purchaser_company = self.cleaned_data['purchaser_company']
+        tax_id = purchaser_company.split(',')[0].split(' ')[1]
+        try:
+            return PurchaserCompany.objects.get(tax_id=tax_id, company_creator=self.company_creator)
+        except:
+            raise forms.ValidationError(f'В базе Ваших клиентов нет компании с налоговым номером {tax_id}')
 
     class Meta:
         model = DebitNote

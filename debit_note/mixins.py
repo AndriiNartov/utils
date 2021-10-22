@@ -22,7 +22,8 @@ class DebitNoteFilterMixin:
         all_years = list()
         for query in queryset:
             for key, year in query.items():
-                all_years.append(str(year))
+                if not str(year) in all_years:
+                    all_years.append(str(year))
         return all_years
 
     def get_all_months(self):

@@ -5,7 +5,7 @@ from .views import PurchaserCompanyListView, PurchaserCompanyDetailView, \
     IssuerCompanyDetailView, BankAccountCreateView, DebitNoteDetailView, DebitNoteSettingsView, DebitNoteDeleteView, \
     DebitNoteCreateView, DebitNoteUpdateView, PurchaserCompanyCreateView, PurchaserCompanyUpdateView, \
     DebitNoteShowHTMLForPrintView, PurchaserCompanyDeleteView, IssuerCompanyDeleteView, BankAccountUpdateView, \
-    BankAccountDeleteView
+    BankAccountDeleteView, create_purchaser_companies_json_response
 
 urlpatterns = [
     path('', DebitNoteListView.as_view(), name='note_all'),
@@ -29,4 +29,6 @@ urlpatterns = [
     path('issuer/detail/<int:pk>/bank_account_update/<int:account_pk>/', BankAccountUpdateView.as_view(), name='issuer_bank_account_update'),
     path('issuer/detail/<int:pk>/bank_account_delete/<int:account_pk>/', BankAccountDeleteView.as_view(), name='issuer_bank_account_delete'),
     path('issuer/delete/<int:pk>/', IssuerCompanyDeleteView.as_view(), name='issuer_delete'),
+
+    path('note/create/ajax/', create_purchaser_companies_json_response, name='note_create_ajax'),
 ]

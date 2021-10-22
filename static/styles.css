@@ -1,0 +1,9 @@
+#result ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    }
+#company_list_item:hover {
+    background: #0099ff;
+    color: #eeeeee;
+    }

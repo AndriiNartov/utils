@@ -5,7 +5,7 @@ from string import digits
 from datetime import datetime
 
 from utils.settings import COMPANY_SEARCH_API_DETAIL_URL, COMPANY_SEARCH_API_DETAIL_QUERY_PARAM
-from .models import DebitNote, Currency
+from .models import DebitNote, Currency, PurchaserCompany
 import os
 
 
@@ -38,20 +38,6 @@ def assign_fields_for_new_note(new_note, new_position, request):
     new_note.positions.add(new_position)
 
 
-# def create_note_in_pdf(template_src, debit_note_pk):
-#     debit_note = DebitNote.objects.get(pk=debit_note_pk)
-#     template = get_template(template_src)
-#     html_content = template.render({'note': debit_note})
-#     new_pdf_file_name = f"{debit_note.number.replace('/', '_')}.pdf"
-#     pdf_content = pydf.generate_pdf(html_content)
-#
-#     from io import BytesIO
-#     bytes_ = BytesIO(pdf_content)
-#     bytes_name = new_pdf_file_name
-#
-#     with open(f'{new_pdf_file_name}', 'wb') as f:
-#         f.write(pdf_content)
-#     return new_pdf_file_name
 def create_temp_company_directory(company_name):
     if not 'tmp' in os.listdir():
         os.mkdir('tmp')
@@ -87,6 +73,11 @@ def convert_html_to_pdf(template_src, debit_note_pk, request):
     path_to_pdf = f'tmp/{company_name_for_dir}/{new_pdf_file_name}'
     os.system(f'wkhtmltopdf {path_to_html} {path_to_pdf}')
     return path_to_pdf
+
+
+def remove_html_and_pdf_files(path):
+    os.remove(f'{path}.pdf')
+    os.remove(f'{path}.html')
 
 
 class CompanyDetailsFromAPIRequest:
@@ -190,3 +181,24 @@ def set_correct_queryset_for_currency(form_instance, request):
     if isinstance(form_instance, forms.BaseForm):
         form_instance.fields['currency'].queryset = Currency.objects.filter(
             company_creator=request.user.company)
+
+
+def purchaser_search_ajax_handling(tax_id, company_creator):
+    queryset = PurchaserCompany.objects.filter(
+        tax_id__startswith=tax_id,
+        company_creator=int(company_creator)
+    )
+    companies = list()
+    for company in queryset:
+        new_company = {
+            'name': company.name,
+            'tax_id': company.tax_id,
+            'address': {
+                'zip_code': company.address.zip_code,
+                'city_name': company.address.city_name,
+                'street_name': company.address.street_name,
+                'house_number': company.address.house_number,
+            }
+        }
+        companies.append(new_company)
+    return companies

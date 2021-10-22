@@ -1,4 +1,5 @@
 {% load bootstrap5 %}
+{% load static %}
 
 <!doctype html>
 <html lang="en">
@@ -12,6 +13,10 @@
 
     <title>{% block title %}Title{% endblock %}</title>
     <script src="https://kit.fontawesome.com/47a157d893.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{% static 'styles.css' %}" type="text/css">
+
+
+
   </head>
   <body>
     <div class="container">

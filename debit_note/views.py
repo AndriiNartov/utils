@@ -1,5 +1,5 @@
 from django.db.models import Count, Q
-from django.http import HttpResponseRedirect, FileResponse, HttpResponseForbidden
+from django.http import HttpResponseRedirect, FileResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.views import View
@@ -12,11 +12,12 @@ from .forms import DebitNoteCreateForm, IssuerCompanyCreateForm, PurchaserCompan
     PositionInlineFormset, BankAccountCreateForm, PaymentMethodFormset, CurrencyFormset, IssuerCompanyFormset, \
     PurchaserCompanyUpdateForm, IssuerCompanyUpdateForm, PaymentMethodCreateForm, CurrencyCreateForm
 from .services import convert_html_to_pdf, CompanyDetailsFromAPIRequest, set_correct_queryset_for_currency, \
-    assign_fields_for_new_note
+    assign_fields_for_new_note, remove_html_and_pdf_files, purchaser_search_ajax_handling
 from account.forms import AddressCreateForm
 
 
 class DebitNoteCreateView(CreateView):
+    #TODO: доделать передачу в ответе адреса покупателя
     model = CreateView
     template_name = 'debit_note/note_create.html'
     form_class = DebitNoteCreateForm
@@ -48,7 +49,7 @@ class DebitNoteCreateView(CreateView):
         context['url_name'] = self.request.resolver_match.url_name
         tax_id_query_param = self.request.GET.get('tax_id')
         if tax_id_query_param:
-            purchaser_company = get_object_or_404(PurchaserCompany.objects.filter(tax_id=self.request.GET['tax_id']))
+            purchaser_company = get_object_or_404(PurchaserCompany.objects.filter(tax_id=tax_id_query_param))
             context['form'].initial.update([('purchaser_company', purchaser_company)])
         return context
 
@@ -72,7 +73,6 @@ class DebitNoteUpdateView(CompanyCreatorPermissionMixin, UpdateView):
     position_formset = PositionInlineFormset
 
     def get(self, request, *args, **kwargs):
-        print(self.get_object().number)
         debit_note = self.get_object()
         context = dict()
         context['form'] = self.form_class(instance=debit_note, company_creator=request.user.company)
@@ -392,8 +392,13 @@ class PurchaserCompanyDeleteView(CompanyCreatorPermissionMixin, DeleteView):
 
 
 def download_note_in_pdf(request, pk):
-    path_to_pdf_file = convert_html_to_pdf('debit_note/note_for_print_and_pdf.html', pk, request)
-    return FileResponse(open(path_to_pdf_file, 'rb'), as_attachment=True)
+    try:
+        path_to_pdf_file = convert_html_to_pdf('debit_note/note_for_print_and_pdf.html', pk, request)
+        return FileResponse(open(path_to_pdf_file, 'rb'), as_attachment=True)
+    except:
+        pass
+    finally:
+        remove_html_and_pdf_files(path_to_pdf_file.split('.')[0])
 
 
 class DebitNoteShowHTMLForPrintView(CompanyCreatorPermissionMixin, DetailView):
@@ -404,3 +409,10 @@ class DebitNoteShowHTMLForPrintView(CompanyCreatorPermissionMixin, DetailView):
 
 class DebitNoteSettingsView(DebitNoteSettingsMixin, View):
     pass
+
+
+def create_purchaser_companies_json_response(request):
+    tax_id_param = request.GET.get('tax_id')
+    company_creator_param = request.GET.get('company_creator')
+    companies = purchaser_search_ajax_handling(tax_id_param, company_creator_param)
+    return JsonResponse({'queryset': companies})
