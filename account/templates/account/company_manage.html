@@ -4,25 +4,12 @@
 {% block base_content %}
 
 
-<div class="row mt-5">
-    <div class="col-4">
-        Моя Компания
-        <p>{{ company }}</p>
-    </div>
-    <div class="col-4">
-        Подтвержденные
-        {% for user in active_users %}
-        <p>{{ user }}</p>
-        {% endfor %}
-    </div>
-</div>
-
-<ul class="nav nav-tabs">
+<ul class="nav nav-tabs mt-5">
   <li class="nav-item">
     <a class="nav-link {% if request.resolver_match.url_name == 'company_manage' %}active{% endif %}" href="{% url 'company_manage' %}" aria-current="page" href="#">Компания</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="#">Активные пользователи</a>
+    <a class="nav-link" href="{% url 'active_users' %}">Активные пользователи</a>
   </li>
   <li class="nav-item position-relative">
     <a class="nav-link {% if request.resolver_match.url_name == 'unconfirmed_users' %}active{% endif %}" href="{% url 'unconfirmed_users' %}">Ожидают подтверждения</a>
@@ -31,10 +18,16 @@
     </span>
   </li>
   <li class="nav-item">
-    <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+    <a class="nav-link" href="{% url 'group_all' %}" tabindex="-1">Группы</a>
   </li>
 </ul>
 {% block content %}
+  <div class="row mt-5">
+    <div class="col">
+        {{ company }}
+        {{ company.invitation_link_suffix }}
+    </div>
+  </div>
 {% endblock %}
 
 {% endblock %}

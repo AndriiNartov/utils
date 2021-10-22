@@ -1,7 +1,9 @@
 from django import forms
+from django.contrib.auth.models import Group, Permission
 from django.contrib.auth import password_validation
 from django.core.exceptions import ValidationError
 from django.forms import modelformset_factory
+
 
 from .models import User, MainCompany, Address
 
@@ -78,3 +80,18 @@ UnconfirmedUsersFormset = modelformset_factory(
         },
     extra=0,
 )
+
+
+class GroupCreateForm(forms.ModelForm):
+    permissions = forms.ModelMultipleChoiceField(widget=forms.SelectMultiple, queryset=Permission.objects.all())
+
+    class Meta:
+        model = Group
+        fields = ('name', 'permissions')
+
+
+class UserUpdateForm(forms.ModelForm):
+
+    class Meta:
+        model = User
+        exclude = ('password', 'is_superuser', 'user_permissions', 'last_login', 'is_staff', 'company')

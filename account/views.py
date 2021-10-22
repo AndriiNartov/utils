@@ -1,14 +1,16 @@
+from django.contrib.auth.models import Group
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import CreateView, DetailView, ListView
+from django.views.generic import CreateView, DetailView, ListView, UpdateView
 from django.views.generic.base import ContextMixin
 
 from .models import User, MainCompany
-from .forms import AddressCreateForm, MainCompanyCreateForm, RegisterUserForm, UnconfirmedUsersFormset
+from .forms import AddressCreateForm, MainCompanyCreateForm, RegisterUserForm, UnconfirmedUsersFormset, GroupCreateForm, \
+    UserUpdateForm
 
 
 class RegisterUserView(CreateView):
@@ -97,6 +99,13 @@ class LoginUserView(LoginView):
     template_name = 'account/login.html'
 
 
+class UserUpdateView(UpdateView):
+    model = User
+    template_name = 'account/user_update.html'
+    form_class = UserUpdateForm
+    success_url = reverse_lazy('active_users')
+
+
 class MainCompanyManageView(ContextMixin, View):
 
     def get_context_data(self, **kwargs):
@@ -140,7 +149,6 @@ class UnconfirmedUsersView(ContextMixin, View):
         return User.objects.filter(company=self.request.user.company, is_confirmed_by_admin=False)
 
     def get(self, request, *args, **kwargs):
-        # formset = UnconfirmedUsersFormset(queryset=self.get_queryset())
         return render(request, 'account/unconfirmed_users.html', self.get_context_data())
 
     def post(self, *args, **kwargs):
@@ -153,3 +161,33 @@ class UnconfirmedUsersView(ContextMixin, View):
                     user.save()
                     return redirect('company_manage')
         return render(self.request, 'account/unconfirmed_users.html', {'formset': formset})
+
+
+class ActiveUsersView(ListView):
+    template_name = 'account/active_users.html'
+    context_object_name = 'users'
+
+    def get_queryset(self):
+        return User.objects.filter(company=self.request.user.company, is_confirmed_by_admin=True)
+
+
+class GroupCreateView(CreateView):
+    template_name = 'account/group_create.html'
+    model = Group
+    form_class = GroupCreateForm
+    success_url = reverse_lazy('group_all')
+
+
+class GroupUpdateView(UpdateView):
+    template_name = 'account/group_update.html'
+    model = Group
+    form_class = GroupCreateForm
+    success_url = reverse_lazy('group_all')
+
+
+class GroupListView(ListView):
+    queryset = Group.objects.all()
+    template_name = 'account/group_list.html'
+    context_object_name = 'groups'
+
+

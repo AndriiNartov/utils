@@ -1,0 +1,18 @@
+{% extends 'account/company_manage.html' %}
+{% load bootstrap5 %}
+
+{% block title %}Редактировать пользователя{% endblock %}
+
+
+{% block content %}
+
+<div class="row mt-5 justify-content-center">
+    <div class="col-6">
+        <form action="" method="post">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
+        </form>
+    </div>
+</div>
+{% endblock %}

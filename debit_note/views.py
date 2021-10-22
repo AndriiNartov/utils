@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import Count, Q
 from django.http import HttpResponseRedirect, FileResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
@@ -16,12 +17,12 @@ from .services import convert_html_to_pdf, CompanyDetailsFromAPIRequest, set_cor
 from account.forms import AddressCreateForm
 
 
-class DebitNoteCreateView(CreateView):
-    #TODO: доделать передачу в ответе адреса покупателя
+class DebitNoteCreateView(PermissionRequiredMixin, CreateView):
     model = CreateView
     template_name = 'debit_note/note_create.html'
     form_class = DebitNoteCreateForm
     position_form = PositionCreateForm
+    permission_required = ('debit_note.add_debitnote')
 
     def get_form_kwargs(self, *args, **kwargs):
         kwargs = super().get_form_kwargs()

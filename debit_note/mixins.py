@@ -1,6 +1,6 @@
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.db.models import Q
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, HttpResponse
 from django.shortcuts import render, redirect
 
 from debit_note.forms import IssuerCompanyFormset, CurrencyFormset, CurrencyCreateForm, PaymentMethodFormset, \
@@ -11,8 +11,7 @@ from debit_note.models import DebitNote, IssuerCompany, Currency, PaymentMethod
 class CompanyCreatorPermissionMixin(UserPassesTestMixin):
 
     def test_func(self):
-        if self.get_object().company_creator == self.request.user.company:
-            return HttpResponseForbidden()
+        return self.get_object().company_creator == self.request.user.company
 
 
 class DebitNoteFilterMixin:
