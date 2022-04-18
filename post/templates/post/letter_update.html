@@ -1,0 +1,49 @@
+{% extends 'post/base.html' %}
+{% load bootstrap5 %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col">
+        <div class="card border-dark">
+        <div class="card-body">
+
+            <div class="card-text offset-lg-3">
+                <form action="" method="post">
+                    {% csrf_token %}
+
+                    <div class="row">
+                        <div class="col-9">{% bootstrap_field form.sending_date %}</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-9">{% bootstrap_field form.truck %}</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-9">{% bootstrap_field form.track_number %}</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-9">{% bootstrap_field form.status %}</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-9">{% bootstrap_field form.status_date %}</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-9">{% bootstrap_field form.comment %}</div>
+                    </div>
+                    {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
+                </form>
+            </div>
+        </div>
+    </div>
+    <br>
+</div>
+</div>
+
+{% endblock %}
+
+

@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     'account',
     'debit_note',
+    'post',
 
     'crispy_forms',
     'bootstrap5',

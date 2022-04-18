@@ -1,0 +1,50 @@
+{% extends 'post/base.html' %}
+{% load crispy_forms_tags %}
+{% load bootstrap5 %}
+
+{% block content %}
+
+
+<div class="row mb-2">
+    <div class="col">
+        <h3 class="text-center mb-3">Удалить письмо?</h3>
+        <table class="table table-bordered text-center table-hover table-striped">
+            <thead>
+                <th>Дата отправки</th>
+                <th>Номер машины</th>
+                <th>Номер письма</th>
+                <th>Статус</th>
+                <th>Дата(статус)</th>
+            </thead>
+                <tr>
+                    <td>{{ letter.sending_date|date:"d-m-Y"}}</td>
+                    <td>{{ letter.truck }}</td>
+                    <td>{{ letter.track_number }}</td>
+                    <td>{{ letter.get_status_display }}</td>
+                    <td>{{ letter.status_date|date:"d-m-Y"}}</td>
+                </tr>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-2 offset-4">
+        <form action="{% url 'letter_delete_one' letter.pk %}" method="post">
+            {% csrf_token %}
+            <input type="submit" class="btn btn-danger" value="Удалить">
+        </form>
+    </div>
+    <div class="col-2">
+        <a href="{% url 'letter_delete_menu' %}" class="btn btn-primary">Назад</a>
+    </div>
+</div>
+{% if paginator.page_range|length > 1 %}
+    <div class="pagination">
+        <div class="row">
+            <div class="col">
+                {% bootstrap_pagination page_obj pages_to_show='3' size="small" %}
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+{% endblock %}

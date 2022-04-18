@@ -1,0 +1,63 @@
+{% extends 'post/base.html' %}
+{% load crispy_forms_tags %}
+{% load bootstrap5 %}
+
+{% block content %}
+
+<ul class="nav nav-tabs mb-5">
+  <li class="nav-item">
+    <a class="nav-link" aria-current="page" href="{% url 'letter_delete_menu' %}">Удаление писем по одному</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link active" href="{% url 'letter_delete_by_date' %}">Удаление писем согласно даты</a>
+  </li>
+</ul>
+
+
+<div class="row">
+    <div class="col">
+        <div class="row mb-4">
+            <h4 class="text-center">Выберите дату и нажмите "Удалить". Все письма, дата отправки которых старше выбранной даты, будут удалены</h4>
+        </div>
+        <form action="" method="post">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-6 offset-2">{% bootstrap_field form.date %}</div>
+                <div class="col-2">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Удалить</button>
+                </div>
+            </div>
+            <!--Modal-->
+            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Подтверждение удаления</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    Действительно хотите удалить все письма, старше выбранной даты?
+                  </div>
+                  <div class="modal-footer">
+                      {% bootstrap_button "Удалить" button_type="submit" button_class="btn-danger" %}
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!--End Modal-->
+        </form>
+    </div>
+</div>
+
+{% if paginator.page_range|length > 1 %}
+    <div class="pagination">
+        <div class="row">
+            <div class="col">
+                {% bootstrap_pagination page_obj pages_to_show='3' size="small" %}
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+{% endblock %}
