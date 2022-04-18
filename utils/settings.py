@@ -12,9 +12,11 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -23,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-uof8h9bef6*%kbanc(=197hn&@a55wrr4b3b=!*1qvzf*@%_=k'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG')
 
 ALLOWED_HOSTS = ['*']
 
@@ -141,3 +143,8 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 COMPANY_SEARCH_API_DETAIL_URL = 'https://wl-api.mf.gov.pl/api/search/nip/'
 COMPANY_SEARCH_API_DETAIL_QUERY_PARAM = '?date='
+
+if DEBUG:
+    CURRENT_HOST_URL = 'http://127.0.0.1:8000/'
+else:
+    CURRENT_HOST_URL = 'http://beta.nartovcv.online/'

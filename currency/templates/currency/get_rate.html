@@ -9,7 +9,7 @@
         <div class="card border-dark">
         <div class="card-body">
             <div class="card-text">
-            <form action="http://127.0.0.1:8000/currency?date={{ form.data.date }}" method="get">
+            <form action="{{ current_host }}currency?date={{ form.data.date }}" method="get">
                 <div class="row">
                     <div class="col-6 offset-3">{% bootstrap_field form.date %}</div>
                 </div>

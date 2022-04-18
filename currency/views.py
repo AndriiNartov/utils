@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from utils.settings import CURRENT_HOST_URL
 from django.shortcuts import render
 
 from .forms import ExchangeRateDateForm, TextFieldForCopyForm
@@ -24,4 +25,11 @@ def get_currency_exchange_rate(request):
         chosen_date = datetime.strptime(request.GET.get('date'), date_format).date()
         form.fields['date'].initial = chosen_date
         text_area_form.fields['text'].initial = make_text_for_paste(str(chosen_date))
-    return render(request, 'currency/get_rate.html', {'form': form, 'text_area_form': text_area_form})
+    return render(
+        request,
+        'currency/get_rate.html', {
+            'form': form,
+            'text_area_form': text_area_form,
+            'current_host': CURRENT_HOST_URL
+        }
+    )
