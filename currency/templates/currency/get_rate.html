@@ -1,0 +1,66 @@
+{% extends 'currency/base.html' %}
+{% load bootstrap5 %}
+
+
+{% block content %}
+
+<div class="row">
+    <div class="col">
+        <div class="card border-dark">
+        <div class="card-body">
+            <div class="card-text">
+            <form action="http://127.0.0.1:8000/currency?date={{ form.data.date }}" method="get">
+                <div class="row">
+                    <div class="col-6 offset-3">{% bootstrap_field form.date %}</div>
+                </div>
+                    <div class="row mb-4">
+                        <div class="col-3 offset-3">
+                            {% bootstrap_button "Получить" button_type="submit" button_class="btn-primary" %}
+                        </div>
+                    </div>
+            </form>
+            <form action="">
+                <div class="row">
+                    <div class="col-6 offset-3">{% bootstrap_field text_area_form.text%}</div>
+                </div>
+                <div class="row">
+                    <div class="col-3 offset-3">
+                        <button class="btn btn-primary" id="js-textareacopybtn">Копировать</button>
+                    </div>
+                </div>
+
+            </form>
+            </div>
+        </div>
+    </div>
+    <br>
+</div>
+</div>
+
+<script>
+window.onload = function () {
+  // Get all the elements that match the selector as arrays
+  var copyTextareaBtn = Array.prototype.slice.call(document.querySelectorAll('#js-textareacopybtn'));
+  var copyTextarea = Array.prototype.slice.call(document.querySelectorAll('#js-copytextarea'));
+
+  // Loop through the button array and set up event handlers for each element
+  copyTextareaBtn.forEach(function(btn, idx){
+
+    btn.addEventListener("click", function(){
+
+      // Get the textarea who's index matches the index of the button
+      copyTextarea[idx].select();
+
+      try {
+        var msg = document.execCommand('copy') ? 'successful' : 'unsuccessful';
+        console.log('Copying text command was ' + msg);
+      } catch (err) {
+        console.log('Whoops, unable to copy');
+      }
+
+    });
+
+  });
+}
+</script>
+{% endblock %}

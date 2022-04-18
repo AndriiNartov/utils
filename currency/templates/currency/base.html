@@ -1,0 +1,37 @@
+{% extends 'account/base.html' %}
+{% load bootstrap5 %}
+
+
+{% block base_content %}
+<div class="row mt-5 mb-3">
+    <div class="col-lg-3"></div>
+    <div class="col-lg-9">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="{% url 'currency' %}">Курс PLN/EUR</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        </div>
+      </nav>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-3 col-md-12 col-sm-12 mt-4">
+        <div class="list-group">
+          <a href="{% url 'note_all' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'note_all' %}active{% endif %}" aria-current="true">Ноты</a>
+          <a href="{% url 'purchaser_all' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'purchaser_all' %}active{% endif %}">Покупатели</a>
+          <a href="{% url 'issuer_all' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'issuer_all' %}active{% endif %}">Продавцы</a>
+          <a href="{% url 'note_settings' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'note_settings' %}active{% endif %}" tabindex="-1">Настройки</a>
+        </div>
+        <div class="mt-5">
+            {% block filter %}
+            {% endblock %}
+        </div>
+    </div>
+    <div class="col-lg-9 col-md-12 col-sm-12 mt-4">
+        {% block content %}
+        {% endblock %}
+    </div>
+</div>
+{% endblock %}

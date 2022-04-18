@@ -9,6 +9,7 @@ urlpatterns = [
     path('account/', include('account.urls')),
     path('debit_note/', include('debit_note.urls')),
     path('post/', include('post.urls')),
+    path('currency/', include('currency.urls')),
 ]
 
 
