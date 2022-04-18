@@ -128,7 +128,7 @@ class DebitNoteListView(DebitNoteFilterMixin, ListView):
     def get_queryset(self):
         return DebitNote.objects.filter(company_creator=self.request.user.company)\
             .annotate(positions_count=Count('positions'))\
-            .filter(positions_count__gte=1)
+            .filter(positions_count__gte=1)\
 
 
 class DebitNoteDeleteView(CompanyCreatorPermissionMixin, DeleteView):

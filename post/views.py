@@ -45,7 +45,7 @@ class LetterListView(ListView):
 
     def get_queryset(self):
         set_status_for_letter()
-        return Letter.objects.all().order_by('sending_date')
+        return Letter.objects.all().order_by('-sending_date')
 
 
 class LetterDeleteMenuView(LetterListView):

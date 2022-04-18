@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+
+from django.urls import reverse_lazy
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -143,6 +145,9 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 COMPANY_SEARCH_API_DETAIL_URL = 'https://wl-api.mf.gov.pl/api/search/nip/'
 COMPANY_SEARCH_API_DETAIL_QUERY_PARAM = '?date='
+
+LOGIN_REDIRECT_URL = reverse_lazy('letter_all')
+LOGOUT_REDIRECT_URL = reverse_lazy('login')
 
 if DEBUG:
     CURRENT_HOST_URL = 'http://127.0.0.1:8000/'
