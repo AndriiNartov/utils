@@ -123,7 +123,7 @@ class DebitNoteListView(DebitNoteFilterMixin, ListView):
     model = DebitNote
     template_name = 'debit_note/note_list.html'
     context_object_name = 'notes'
-    paginate_by = 1
+    paginate_by = 10
 
     def get_queryset(self):
         return self.filter_get_queryset()
