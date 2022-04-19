@@ -15,7 +15,7 @@
                 <th>Дата оплаты</th>
                 <th>Плательщик</th>
             </thead>
-            {% for note in view.filter_get_queryset %}
+            {% for note in page_obj %}
                 <tr {% if note.is_paid %}class="table-success"{% endif %}>
                     <td><a href="{% url 'preview' note.pk %}" title="Посмотреть детали">{{ note.number }}</a></td>
                     <td>{{ note.issue_date|date:"d-m-Y" }}</td>

@@ -59,6 +59,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'account.middleware.AuthRequiredMiddleware',
 ]
 
 ROOT_URLCONF = 'utils.urls'
@@ -148,6 +150,7 @@ COMPANY_SEARCH_API_DETAIL_QUERY_PARAM = '?date='
 
 LOGIN_REDIRECT_URL = reverse_lazy('letter_all')
 LOGOUT_REDIRECT_URL = reverse_lazy('login')
+LOGIN_URL = reverse_lazy('login')
 
 if DEBUG:
     CURRENT_HOST_URL = 'http://127.0.0.1:8000/'
