@@ -84,7 +84,7 @@ class DebitNoteCreateForm(forms.ModelForm):
 
     def clean_purchaser_company(self):
         purchaser_company = self.cleaned_data['purchaser_company']
-        tax_id = purchaser_company.split(',')[0].split(' ')[1]
+        tax_id = purchaser_company.split('NIP: ')[1].split(',')[0]
         try:
             return PurchaserCompany.objects.get(tax_id=tax_id, company_creator=self.company_creator)
         except:

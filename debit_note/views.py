@@ -79,6 +79,7 @@ class DebitNoteUpdateView(CompanyCreatorPermissionMixin, UpdateView):
         context['form'] = self.form_class(instance=debit_note, company_creator=request.user.company)
         formset = self.position_formset(instance=debit_note)
         set_correct_queryset_for_currency(formset, request)
+        context['form'].initial['purchaser_company'] = debit_note.purchaser_company
         context['formset'] = formset
         context['object'] = self.get_object()
 
