@@ -9,25 +9,71 @@
     <a class="nav-link {% if request.resolver_match.url_name == 'company_manage' %}active{% endif %}" href="{% url 'company_manage' %}" aria-current="page" href="#">Компания</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="{% url 'active_users' %}">Активные пользователи</a>
+    <a class="nav-link {% if request.resolver_match.url_name == 'active_users' %}active{% endif %}" href="{% url 'active_users' %}">Активные пользователи</a>
   </li>
   <li class="nav-item position-relative">
     <a class="nav-link {% if request.resolver_match.url_name == 'unconfirmed_users' %}active{% endif %}" href="{% url 'unconfirmed_users' %}">Ожидают подтверждения</a>
+    {% if not_confirmed_users %}
     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
         {% if not_confirmed_users %}{{ not_confirmed_users.count }}{% endif %}
     </span>
+    {% endif %}
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="{% url 'group_all' %}" tabindex="-1">Группы</a>
+    <a class="nav-link {% if request.resolver_match.url_name == 'group_all' %}active{% endif %}" href="{% url 'group_all' %}" tabindex="-1">Группы</a>
   </li>
 </ul>
 {% block content %}
-  <div class="row mt-5">
-    <div class="col">
-        {{ company }}
-        {{ company.invitation_link_suffix }}
-    </div>
+<div class="row mt-5">
+  <div class="col">
+    <h5>{{ company }}</h5>
+    <h5>{{ company.address }}</h5>
+    <h5>NIP: {{ company.tax_id }}</h5>
   </div>
+</div>
+<div class="row mt-5">
+  <div class="col">
+    <h5>Пригласительная ссылка для регистрации новых сотрудников компании:</h5>
+    <br>
+    <form action="">
+      <div class="row">
+        <div class="col-9">
+            <input style="width: 600px" type="text" id="js-copytextarea" value="{{CURRENT_HOST_URL}}account/register/{{ company.invitation_link_suffix }}">
+        </div>
+      </div>
+          <br>
+      <button class="btn btn-sm btn-primary" id="js-textareacopybtn">Копировать</button>
+    </form>
+  </div>
+</div>
+
+
+<script>
+window.onload = function () {
+  // Get all the elements that match the selector as arrays
+  var copyTextareaBtn = Array.prototype.slice.call(document.querySelectorAll('#js-textareacopybtn'));
+  var copyTextarea = Array.prototype.slice.call(document.querySelectorAll('#js-copytextarea'));
+
+  // Loop through the button array and set up event handlers for each element
+  copyTextareaBtn.forEach(function(btn, idx){
+
+    btn.addEventListener("click", function(){
+
+      // Get the textarea who's index matches the index of the button
+      copyTextarea[idx].select();
+
+      try {
+        var msg = document.execCommand('copy') ? 'successful' : 'unsuccessful';
+        console.log('Copying text command was ' + msg);
+      } catch (err) {
+        console.log('Whoops, unable to copy');
+      }
+
+    });
+
+  });
+}
+</script>
 {% endblock %}
 
 {% endblock %}

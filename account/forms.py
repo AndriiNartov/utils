@@ -76,14 +76,18 @@ UnconfirmedUsersFormset = modelformset_factory(
     User,
     fields=('username', 'is_confirmed_by_admin',),
     widgets={
-            'is_confirmed_by_admin': forms.CheckboxInput(attrs={'id': 'is_confirmed_by_admin'})
+            'is_confirmed_by_admin': forms.CheckboxInput(attrs={'id': 'is_confirmed_by_admin'}),
         },
     extra=0,
+    help_texts={'username': None}
 )
 
 
 class GroupCreateForm(forms.ModelForm):
-    permissions = forms.ModelMultipleChoiceField(widget=forms.SelectMultiple, queryset=Permission.objects.all())
+    permissions = forms.ModelMultipleChoiceField(
+        widget=forms.SelectMultiple,
+        queryset=Permission.objects.all()
+    )
 
     class Meta:
         model = Group

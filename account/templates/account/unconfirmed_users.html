@@ -5,7 +5,7 @@
 
 
 {% block content %}
-
+{% if not_confirmed_users %}
 <div class="row mt-5 justify-content-center">
     <div class="col-6">
         <h2 class="text-center">Неподтвержденные пользователи</h2>
@@ -16,4 +16,11 @@
         </form>
     </div>
 </div>
+{% else %}
+<div class="row mt-5 justify-content-center">
+    <div class="col-9">
+        <h2 class="text-center">Нет пользователей, ожидающих подтверждения</h2>
+    </div>
+</div>
+{% endif %}
 {% endblock %}

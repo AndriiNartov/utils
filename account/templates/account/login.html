@@ -7,10 +7,12 @@
     <div class="col-6">
         <h2 class="text-center">Вход</h2>
         <form action="" method="post">
-                {% csrf_token %}
-                {% bootstrap_form form %}
-                {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
-            </form>
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            {% bootstrap_button "Войти" button_type="submit" button_class="btn-primary" %}
+        </form>
+        <br>
+        <span>Нет аккаунта? <a href="{% url 'register' %}">Зарегистрируйся!</a></span>
     </div>
 </div>
 

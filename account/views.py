@@ -8,6 +8,7 @@ from django.views import View
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 from django.views.generic.base import ContextMixin
 
+from utils.settings import CURRENT_HOST_URL
 from .models import User, MainCompany
 from .forms import AddressCreateForm, MainCompanyCreateForm, RegisterUserForm, UnconfirmedUsersFormset, GroupCreateForm, \
     UserUpdateForm
@@ -111,6 +112,7 @@ class MainCompanyManageView(ContextMixin, View):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         company = self.request.user.company
+        context['CURRENT_HOST_URL'] = CURRENT_HOST_URL
         context['company'] = company
         context['active_users'] = User.objects.filter(
             company=company,
@@ -167,6 +169,14 @@ class ActiveUsersView(ListView):
     template_name = 'account/active_users.html'
     context_object_name = 'users'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['not_confirmed_users'] = User.objects.filter(
+            company=self.request.user.company,
+            is_confirmed_by_admin=False
+        )
+        return context
+
     def get_queryset(self):
         return User.objects.filter(company=self.request.user.company, is_confirmed_by_admin=True)
 
@@ -189,5 +199,13 @@ class GroupListView(ListView):
     queryset = Group.objects.all()
     template_name = 'account/group_list.html'
     context_object_name = 'groups'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['not_confirmed_users'] = User.objects.filter(
+            company=self.request.user.company,
+            is_confirmed_by_admin=False
+        )
+        return context
 
 
