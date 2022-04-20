@@ -15,7 +15,8 @@ class PositionCreateForm(forms.ModelForm):
                 'placeholder': ''
             }
         ),
-        label='Описание/причина выставления ноты'
+        label='Описание/причина выставления ноты',
+        initial='Za dojazd auta wg zlecenia z dnia'
     )
     currency = forms.ModelChoiceField(
         widget=forms.Select,
